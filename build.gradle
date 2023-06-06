@@ -1,5 +1,5 @@
-apply plugin: 'java'
-apply plugin: 'maven-publish'
+apply plugin: "java"
+apply plugin: "maven-publish"
 
 archivesBaseName = project.archives_base_name
 version = project.self_version
@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.google.guava:guava:'+ project.guava_version +'-jre'
+  implementation "com.google.guava:guava:${project.guava_version}-jre"
 }
 
 java {
@@ -30,6 +30,6 @@ publishing {
 }
 
 wrapper {
-  gradleVersion = '8.1.1'
+  gradleVersion = "8.1.1"
   distributionType = Wrapper.DistributionType.ALL
 }
