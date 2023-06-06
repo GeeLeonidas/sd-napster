@@ -1,0 +1,35 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+archivesBaseName = project.archives_base_name
+version = project.self_version
+group = project.maven_group
+
+sourceCompatibility = project.jdk_version
+targetCompatibility = project.jdk_version
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'com.google.guava:guava:'+ project.guava_version +'-jre'
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      from components.java
+    }
+  }
+}
+
+wrapper {
+  gradleVersion = '8.1.1'
+  distributionType = Wrapper.DistributionType.ALL
+}
