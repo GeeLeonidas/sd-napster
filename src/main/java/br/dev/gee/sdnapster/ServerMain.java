@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Main {
+public class ServerMain {
     public static final int SERVER_PORT = 31337;
     public static final String MAGIC_STRING     = "SEVMTE8gVEhFUkUhIE1BWSBJIENPTUUgSU4/",
                                GOODBYE_STRING   = "RkFSRVdFTEwsIEZSSUVORC4uLiBVTlRJTCBORVhUIFRJTUUh";

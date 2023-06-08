@@ -22,12 +22,12 @@ public class ServerCommsRunnable implements Runnable {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         ) {
             String receivedMessage = in.readLine();
-            if (receivedMessage != Main.MAGIC_STRING) {
+            if (receivedMessage != ServerMain.MAGIC_STRING) {
                 log.severe("Received a first message that isn't magical :(");
                 return;
             }
             while ((receivedMessage = in.readLine()) != null) {
-                if (receivedMessage == Main.GOODBYE_STRING)
+                if (receivedMessage == ServerMain.GOODBYE_STRING)
                     return;
                 final String messageCode = receivedMessage.substring(0, 3),
                              messageContent = receivedMessage.substring(3);
