@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerMain {
-    public static final int SERVER_PORT = 31337;
-    public static final String MAGIC_STRING     = "SEVMTE8gVEhFUkUhIE1BWSBJIENPTUUgSU4/",
-                               GOODBYE_STRING   = "RkFSRVdFTEwsIEZSSUVORC4uLiBVTlRJTCBORVhUIFRJTUUh";
+import br.dev.gee.sdnapster.common.Constants;
 
+public class ServerMain {
     public static void main(String[] args) {
         try (
-            ServerSocket serverSocket = new ServerSocket(SERVER_PORT);
+            ServerSocket serverSocket = new ServerSocket(Constants.SERVER_PORT);
         ) {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
