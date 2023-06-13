@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -45,6 +44,11 @@ public class ServerCommsRunnable implements Runnable {
                             log.warning("Received borked message content (code '%s'): args.length != 2".formatted(messageCode));
                             break;
                         }
+                        /***
+                         * fileName: Nome do arquivo que é disponibilizado pelo peer
+                         * fileLastIdx: Index do último pedaço disponível do arquivo (assume que todos os anteriores estão também disponíveis)
+                         * address: Utilizado como identificador da máquina do peer
+                         ***/
                         final String fileName = new String(Base64.getUrlDecoder().decode(args[0]));
                         final int fileLastIdx = Math.max(0, Integer.parseInt(args[1]));
                         final String address = clientSocket.getInetAddress().getHostAddress();
