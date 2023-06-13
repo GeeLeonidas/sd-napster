@@ -5,15 +5,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import br.dev.gee.sdnapster.common.Constants;
 
 public class ServerCommsRunnable implements Runnable {
     private Socket clientSocket;
+    private HashMap<String, HashMap<String, Integer>> addressToFileInfoMap;
 
     public ServerCommsRunnable(Socket clientSocket) {
         this.clientSocket = clientSocket;
+        this.addressToFileInfoMap = new HashMap<>();
     }
 
     @Override
@@ -40,6 +45,16 @@ public class ServerCommsRunnable implements Runnable {
                             log.warning("Received borked message content (code '%s'): args.length != 2".formatted(messageCode));
                             break;
                         }
+                        final String fileName = new String(Base64.getUrlDecoder().decode(args[0]));
+                        final int fileLastIdx = Math.max(0, Integer.parseInt(args[1]));
+                        final String address = clientSocket.getInetAddress().getHostAddress();
+                        
+                        HashMap<String, Integer> fileToIdxMap = addressToFileInfoMap.getOrDefault(address, new HashMap<>());
+                        fileToIdxMap.put(fileName, fileLastIdx);
+                        addressToFileInfoMap.put(address, fileToIdxMap);
+                        if (fileToIdxMap.size() == 1)
+                            log.info("Created file info table for address '%s'!".formatted(address));
+                        log.info("Updated file for address '%s'! Name (index '%d'): '%s'".formatted(address, fileLastIdx, fileName));
                         break;
                     default:
                         log.warning("Received unknown message code: '%s'".formatted(messageCode));
