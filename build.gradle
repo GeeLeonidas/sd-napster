@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
   implementation "com.google.guava:guava:${project.guava_version}-jre"
+  implementation "com.google.code.gson:gson:${project.gson_version}"
 }
 
 java {
