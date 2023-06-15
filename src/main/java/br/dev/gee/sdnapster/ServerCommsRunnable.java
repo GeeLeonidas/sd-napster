@@ -5,19 +5,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
 import br.dev.gee.sdnapster.common.Constants;
+import br.dev.gee.sdnapster.common.MD5;
+import br.dev.gee.sdnapster.common.MapAccessor;
 
 public class ServerCommsRunnable implements Runnable {
     private Socket clientSocket;
-    private HashMap<String, HashMap<String, Integer>> addressToFileInfoMap;
+    private MapAccessor<String, ArrayList<MD5>> nameToChunksMap;
 
-    public ServerCommsRunnable(Socket clientSocket) {
+    public ServerCommsRunnable(Socket clientSocket, MapAccessor<String, ArrayList<MD5>> nameToChunksMap) {
         this.clientSocket = clientSocket;
-        this.addressToFileInfoMap = new HashMap<>();
+        this.nameToChunksMap = nameToChunksMap;
     }
 
     @Override

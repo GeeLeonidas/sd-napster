@@ -14,6 +14,11 @@ public class MD5 {
     }
 
     @Override
+    public int hashCode() {
+        return hashValue.hashCode();
+    }
+
+    @Override
     public boolean equals(Object arg0) {
         try {
             MD5 other = (MD5) arg0;
