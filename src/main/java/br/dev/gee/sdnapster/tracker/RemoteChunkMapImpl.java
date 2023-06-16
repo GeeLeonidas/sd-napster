@@ -50,7 +50,7 @@ public class RemoteChunkMapImpl extends UnicastRemoteObject implements RemoteChu
     }
 
     @Override
-    public @Nonnull Set<String> search(@Nonnull String fromHostsFile, @Nonnull MD5 forChunkHash) {
+    public @Nonnull Set<String> search(@Nonnull String fromHostsFile, @Nonnull MD5 forChunkHash) throws RemoteException {
         HashSet<String> result = new HashSet<>();
         
         Enumeration<String> clientHosts = chunkMapByHost.keys();
