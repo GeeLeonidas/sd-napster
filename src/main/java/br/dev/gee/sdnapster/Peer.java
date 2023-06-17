@@ -1,5 +1,6 @@
 package br.dev.gee.sdnapster;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.rmi.NotBoundException;
@@ -14,16 +15,14 @@ public class Peer {
 		while (true) {
 			System.out.print("Insira diretório do peer: ");
 			try {
-				Path path = Path.of(scanner.nextLine());
+				Path path = FileSystems.getDefault().getPath(scanner.nextLine());
 				if (Files.isDirectory(path))
 					return path;
-			} catch (Exception e) {
-				continue;
-			}
+			} catch (Exception ignored) {}
 		}
 	}
 	
-	public static void main(String args[]) throws NotBoundException {
+	public static void main(String[] args) throws NotBoundException {
 		final String trackerService = TrackerService.class.getCanonicalName();
 		final Scanner scanner = new Scanner(System.in);
 		
@@ -34,7 +33,7 @@ public class Peer {
 		try {
 			final Registry registry = LocateRegistry.getRegistry(trackerHost, trackerPort);
 			final TrackerService tracker = (TrackerService)
-					registry.lookup("//%s:%d/%s".formatted(trackerHost, trackerPort, trackerService));
+					registry.lookup(String.format("//%s:%d/%s", trackerHost, trackerPort, trackerService));
 			
 		} catch (RemoteException e) {
 			e.printStackTrace();

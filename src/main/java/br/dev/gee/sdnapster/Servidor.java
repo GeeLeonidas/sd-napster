@@ -13,7 +13,7 @@ public class Servidor {
 	
 	public static String readHost(Scanner scanner) {
 		while (true) {
-			System.out.print("Insira host do tracker (IPv4, padrão %s): ".formatted(Servidor.DEFAULT_HOST));
+			System.out.printf("Insira host do tracker (IPv4, padrão %s): ", Servidor.DEFAULT_HOST);
 			String hostString = scanner.nextLine();
 			if (hostString.isEmpty())
 				return Servidor.DEFAULT_HOST;
@@ -25,7 +25,7 @@ public class Servidor {
 	
 	public static int readPort(Scanner scanner) {
 		while (true) {
-			System.out.print("Insira porta do tracker (padrão %d): ".formatted(Servidor.DEFAULT_PORT));
+			System.out.printf("Insira porta do tracker (padrão %d): ", Servidor.DEFAULT_PORT);
 			String portString = scanner.nextLine();
 			if (portString.isEmpty())
 				return Servidor.DEFAULT_PORT;
@@ -34,10 +34,8 @@ public class Servidor {
 				return Integer.parseInt(portString);
 		}
 	}
-	
-	private static Registry registry;
-	
-	public static void main(String args[]) {
+
+	public static void main(String[] args) {
 		final String service = TrackerService.class.getCanonicalName();
 		final Scanner scanner = new Scanner(System.in);
 		
@@ -46,10 +44,10 @@ public class Servidor {
 		
 		final TrackerServiceImpl trackerImpl = new TrackerServiceImpl();
 		try {
-			registry = LocateRegistry.createRegistry(DEFAULT_PORT);
+			final Registry registry = LocateRegistry.createRegistry(DEFAULT_PORT);
 			final TrackerService stub =
 					(TrackerService) UnicastRemoteObject.exportObject(trackerImpl, DEFAULT_PORT);
-			registry.rebind("//%s:%d/%s".formatted(DEFAULT_HOST, DEFAULT_PORT, service), stub);
+			registry.rebind(String.format("//%s:%d/%s", DEFAULT_HOST, DEFAULT_PORT, service), stub);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
