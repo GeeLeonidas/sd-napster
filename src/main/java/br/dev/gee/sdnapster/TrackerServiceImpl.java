@@ -10,18 +10,23 @@ import java.util.List;
 
 public class TrackerServiceImpl implements TrackerService {
 
-	private HashMap<String, HashSet<String>> hostToFileMap;
+	private final HashMap<String, HashSet<String>> hostToFileMap;
+	private final HashMap<String, Peer.Address> hostToTcpAddress;
 	
 	public TrackerServiceImpl() {
 		this.hostToFileMap = new HashMap<>();
+		this.hostToTcpAddress = new HashMap<>();
 	}
 
 	@Override
-	public String join(List<String> filenames) throws RemoteException {
+	public String join(List<String> filenames, Peer.Address addressInfo) throws RemoteException {
 		try {
 			final String clientHost = UnicastRemoteObject.getClientHost();
 			synchronized (hostToFileMap) {
 				hostToFileMap.put(clientHost, new HashSet<>(filenames));
+				synchronized (hostToTcpAddress) {
+					hostToTcpAddress.put(clientHost, addressInfo);
+				}
 			}
 		} catch (ServerNotActiveException e) {
 			e.printStackTrace();
@@ -31,13 +36,16 @@ public class TrackerServiceImpl implements TrackerService {
 	}
 
 	@Override
-	public List<String> search(String filename) throws RemoteException {
-		ArrayList<String> result = new ArrayList<>();
+	public List<Peer.Address> search(String filename) throws RemoteException {
+		ArrayList<Peer.Address> result = new ArrayList<>();
 		
 		synchronized (hostToFileMap) {
 			hostToFileMap.forEach((clientHost, fileSet) -> {
-				if (fileSet.contains(filename))
-					result.add(clientHost);
+				if (fileSet.contains(filename)) {
+					synchronized (hostToTcpAddress) {
+						result.add(hostToTcpAddress.get(clientHost));
+					}
+				}
 			});
 		}
 		
@@ -45,7 +53,7 @@ public class TrackerServiceImpl implements TrackerService {
 	}
 
 	@Override
-	public String update(String filename) throws RemoteException {
+	public String update(String filename, Peer.Address addressInfo) throws RemoteException {
 		try {
 			final String clientHost = UnicastRemoteObject.getClientHost();
 			synchronized (hostToFileMap) {
