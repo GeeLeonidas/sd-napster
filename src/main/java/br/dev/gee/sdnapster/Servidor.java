@@ -52,10 +52,10 @@ public class Servidor {
 		
 		final TrackerServiceImpl trackerImpl = new TrackerServiceImpl();
 		try {
-			final Registry registry = LocateRegistry.createRegistry(DEFAULT_TRACKER_PORT);
+			final Registry registry = LocateRegistry.createRegistry(port);
 			final TrackerService stub =
-					(TrackerService) UnicastRemoteObject.exportObject(trackerImpl, DEFAULT_TRACKER_PORT);
-			registry.rebind(String.format("//%s:%d/%s", DEFAULT_TRACKER_HOST, DEFAULT_TRACKER_PORT, service), stub);
+					(TrackerService) UnicastRemoteObject.exportObject(trackerImpl, port);
+			registry.rebind(String.format("//%s:%d/%s", host, port, service), stub);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
