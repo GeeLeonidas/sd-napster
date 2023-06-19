@@ -147,16 +147,10 @@ public class Peer {
 							System.out.println("Execute uma requisição JOIN antes!");
 							continue;
 						}
-						while (true) {
-							System.out.printf("Insira o nome do arquivo (em %s): ", peerPath.toAbsolutePath());
-							final String filename = scanner.nextLine();
-							final List<String> folder = Peer.listAllFilenames(peerPath);
-							if (!folder.contains(filename))
-								continue;
-							searchCache = tracker.search(filename);
-							searchedFile = filename;
-							break;
-						}
+						System.out.print("Insira o nome do arquivo a ser procurado na rede: ");
+						final String filename = scanner.nextLine();
+						searchCache = tracker.search(filename);
+						searchedFile = filename;
 						break;
 					case "DOWNLOAD":
 						if (searchCache == null) {
