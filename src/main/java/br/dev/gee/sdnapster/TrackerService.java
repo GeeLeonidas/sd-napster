@@ -9,7 +9,8 @@ public interface TrackerService extends Remote {
 	/**
  	 * Endereço do peer é inserido na rede junto de uma lista com o nome de seus arquivos
  	 * @param	filenames	Nome dos arquivos (sem o caminho) disponíveis na máquina do peer
-	 * @return 					"JOIN_OK" ou "JOIN_ERR"
+	 * @param 	addressInfo	Informação do endereço onde os arquivos serão disponibilizados
+	 * @return 				"JOIN_OK" ou "JOIN_ERR"
 	 */
 	String join(List<String> filenames, Peer.Address addressInfo) throws RemoteException;
 	
@@ -23,6 +24,7 @@ public interface TrackerService extends Remote {
 	/**
 	 * Dado o nome do arquivo baixado pelo peer, adiciona-o à lista dos disponíveis na rede
 	 * @param	filename	Nome do arquivo (sem o caminho) a ser adicionado como disponível
+	 * @param 	addressInfo	Informação do endereço onde os arquivos serão disponibilizados
 	 * @return 				"UPDATE_OK" ou "UPDATE_ERR"
 	 */
 	String update(String filename, Peer.Address addressInfo) throws RemoteException;
