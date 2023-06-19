@@ -76,21 +76,47 @@ public class Peer {
 			final TrackerService tracker = (TrackerService)
 					registry.lookup(String.format("//%s:%d/%s", trackerHost, trackerPort, trackerService));
 			String option;
+			Path peerPath = null;
+			List<Address> searchCache = null;
 			while (!(option = Peer.readOption(scanner)).equals("EXIT")) {
 				switch (option) {
 					case "JOIN":
 						final String tcpHost = Servidor.readHost(scanner, "TCP", Peer.DEFAULT_TCP_HOST);
 						final int tcpPort = Servidor.readPort(scanner, "TCP", Peer.DEFAULT_TCP_PORT);
-						final Path peerPath = Peer.readPath(scanner);
+						peerPath = Peer.readPath(scanner);
 						final List<String> filenames = Peer.listAllFilenames(peerPath);
 						// TODO: Add TCP thread implementation
-						tracker.join(filenames, new Address(tcpHost, tcpPort));
+						assert tracker.join(filenames, new Address(tcpHost, tcpPort)).equals("JOIN_OK");
 						break;
 					case "SEARCH":
-						// TODO: Add SEARCH request implementation
+						if (peerPath == null) {
+							System.out.println("Execute uma requisição JOIN antes!");
+							continue;
+						}
+						while (true) {
+							System.out.printf("Insira o nome do arquivo (em %s): ", peerPath.toAbsolutePath());
+							final String filename = scanner.nextLine();
+							final List<String> folder = Peer.listAllFilenames(peerPath);
+							if (!folder.contains(filename))
+								continue;
+							searchCache = tracker.search(filename);
+							break;
+						}
 						break;
 					case "DOWNLOAD":
-						// TODO: Add DOWNLOAD request implementation
+						if (searchCache == null) {
+							System.out.println("Execute uma requisição SEARCH antes!");
+							continue;
+						}
+						while (true) {
+							final String downloadHost = Servidor.readHost(scanner, "Download", Peer.DEFAULT_TCP_HOST);
+							final int downloadPort = Servidor.readPort(scanner, "Download", Peer.DEFAULT_TCP_PORT);
+							final Address downloadAddress = new Address(downloadHost, downloadPort);
+							if (!searchCache.contains(downloadAddress))
+								continue;
+							// TODO: Add TCP download implementation
+							break;
+						}
 						break;
 				}
 			}
