@@ -32,6 +32,8 @@ public class TrackerServiceImpl implements TrackerService {
 			e.printStackTrace();
 			return "JOIN_ERR";
 		}
+
+		System.out.printf("Peer %s adicionado com arquivos %s\n", addressInfo, String.join(" ", filenames));
 		return "JOIN_OK";
 	}
 
@@ -48,7 +50,16 @@ public class TrackerServiceImpl implements TrackerService {
 				}
 			});
 		}
-		
+
+		try {
+			final String clientHost = UnicastRemoteObject.getClientHost();
+			synchronized (hostToTcpAddress) {
+				System.out.printf("Peer %s solicitou arquivo %s", hostToTcpAddress.get(clientHost), filename);
+			}
+		} catch (ServerNotActiveException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
 		return result;
 	}
 

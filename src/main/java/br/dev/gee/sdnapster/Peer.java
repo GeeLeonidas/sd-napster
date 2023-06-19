@@ -25,6 +25,11 @@ public class Peer {
 			this.ip = ip;
 			this.port = port;
 		}
+
+		@Override
+		public String toString() {
+			return String.format("%s:%d", this.ip.getHostAddress(), this.port);
+		}
 	}
 
 	public static InetAddress DEFAULT_TCP_HOST = Servidor.DEFAULT_TRACKER_HOST;
@@ -141,6 +146,7 @@ public class Peer {
 						assert tracker.join(filenames, new Address(tcpHost, tcpPort)).equals("JOIN_OK");
 						peerPath = finalPeerPath;
 						tcpAddress = new Address(tcpHost, tcpPort);
+						System.out.printf("Sou peer %s:%d com arquivos %s\n", tcpHost, tcpPort, String.join(" ", filenames));
 						break;
 					case "SEARCH":
 						if (peerPath == null) {
@@ -151,6 +157,10 @@ public class Peer {
 						final String filename = scanner.nextLine();
 						searchCache = tracker.search(filename);
 						searchedFile = filename;
+						final ArrayList<String> stringSearchCache = new ArrayList<>();
+						for (Address address : searchCache)
+							stringSearchCache.add(address.toString());
+						System.out.printf("peers com arquivo solicitado: %s\n", String.join(" ", stringSearchCache));
 						break;
 					case "DOWNLOAD":
 						if (searchCache == null) {
@@ -168,7 +178,8 @@ public class Peer {
 							if (!searchCache.contains(downloadAddress))
 								continue;
 							final String finalSearchedFile = searchedFile;
-							final Path downloadPath = FileSystems.getDefault().getPath(peerPath + finalSearchedFile);
+							final Path finalDownloadFolder = peerPath;
+							final Path downloadPath = FileSystems.getDefault().getPath(finalDownloadFolder + finalSearchedFile);
 							final Address finalTcpAddress = tcpAddress;
 							new Thread(() -> {
 								try (
@@ -194,8 +205,10 @@ public class Peer {
 												break;
 										}
 									}
-									if (!serverSocket.isClosed())
-										tracker.update(finalSearchedFile, finalTcpAddress);
+									if (!serverSocket.isClosed()) {
+										assert tracker.update(finalSearchedFile, finalTcpAddress).equals("UPDATE_OK");
+										System.out.printf("Arquivo %s baixado com sucesso na pasta %s\n", finalSearchedFile, finalDownloadFolder);
+									}
 								} catch (IOException e) {
 									throw new RuntimeException(e);
 								}
