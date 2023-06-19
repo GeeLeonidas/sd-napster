@@ -77,7 +77,7 @@ public class Peer {
 		try {
 			final Registry registry = LocateRegistry.getRegistry(trackerHost.getHostAddress(), trackerPort);
 			final TrackerService tracker = (TrackerService)
-					registry.lookup(String.format("//%s:%d/%s", trackerHost, trackerPort, trackerService));
+					registry.lookup(String.format("//%s:%d/%s", trackerHost.getHostAddress(), trackerPort, trackerService));
 			String option;
 			Path peerPath = null;
 			List<Address> searchCache = null;
