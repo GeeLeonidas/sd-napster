@@ -43,7 +43,7 @@ public class Servidor {
 
 	public static int readPort(Scanner scanner, String hostNickname, int defaultPort) {
 		while (true) {
-			System.out.printf("Insira porta do %s (padrão %d): ", hostNickname, Servidor.DEFAULT_TRACKER_PORT);
+			System.out.printf("Insira porta do %s (padrão %d): ", hostNickname, defaultPort);
 			String portString = scanner.nextLine();
 			if (portString.isEmpty())
 				return defaultPort;
