@@ -17,7 +17,7 @@ import java.util.Scanner;
 
 public class Peer {
 
-	public static class Address {
+	public static class Address implements Serializable {
 		public final InetAddress ip;
 		public final int port;
 
@@ -61,7 +61,8 @@ public class Peer {
 	}
 
 	public static List<String> listAllFilenames(Path directory) {
-		assert Files.isDirectory(directory);
+		if (!Files.isDirectory(directory))
+			throw new RuntimeException(String.format("%s is not a directory!", directory));
 		ArrayList<String> result = new ArrayList<>();
 		File[] files = directory.toFile().listFiles();
 		files = (files != null) ? files : new File[0];
@@ -143,10 +144,10 @@ public class Peer {
 							}
 						});
 						tcpThread.start();
-						assert tracker.join(filenames, new Address(tcpHost, tcpPort)).equals("JOIN_OK");
+						tracker.join(filenames, new Address(tcpHost, tcpPort)); // TODO: Handle return code
 						peerPath = finalPeerPath;
 						tcpAddress = new Address(tcpHost, tcpPort);
-						System.out.printf("Sou peer %s:%d com arquivos %s\n", tcpHost, tcpPort, String.join(" ", filenames));
+						System.out.printf("Sou peer %s:%d com arquivos %s\n", tcpHost.getHostAddress(), tcpPort, String.join(" ", filenames));
 						break;
 					case "SEARCH":
 						if (peerPath == null) {
@@ -206,7 +207,7 @@ public class Peer {
 										}
 									}
 									if (!serverSocket.isClosed()) {
-										assert tracker.update(finalSearchedFile, finalTcpAddress).equals("UPDATE_OK");
+										tracker.update(finalSearchedFile, finalTcpAddress); // TODO: Handle return code
 										System.out.printf("Arquivo %s baixado com sucesso na pasta %s\n", finalSearchedFile, finalDownloadFolder);
 									}
 								} catch (IOException e) {
