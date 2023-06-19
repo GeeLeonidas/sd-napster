@@ -1,5 +1,7 @@
 package br.dev.gee.sdnapster;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -8,22 +10,30 @@ import java.util.Scanner;
 
 public class Servidor {
 
-	public static String DEFAULT_TRACKER_HOST = "127.0.0.1";
+	public static InetAddress DEFAULT_TRACKER_HOST;
+	static {
+		try {
+			DEFAULT_TRACKER_HOST = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static int DEFAULT_TRACKER_PORT = 1099;
 
-	public static String readHost(Scanner scanner) {
+	public static InetAddress readHost(Scanner scanner) {
 		return Servidor.readHost(scanner, "Tracker", Servidor.DEFAULT_TRACKER_HOST);
 	}
 
-	public static String readHost(Scanner scanner, String hostNickname, String defaultHost) {
+	public static InetAddress readHost(Scanner scanner, String hostNickname, InetAddress defaultHost) {
 		while (true) {
-			System.out.printf("Insira host do %s (IPv4, padrão %s): ", hostNickname, Servidor.DEFAULT_TRACKER_HOST);
+			System.out.printf("Insira host do %s (padrão %s): ", hostNickname, Servidor.DEFAULT_TRACKER_HOST);
 			String hostString = scanner.nextLine();
 			if (hostString.isEmpty())
 				return defaultHost;
-			// Padrão IPv4 (Fonte: https://ihateregex.io/expr/ip/)
-			if (hostString.matches("^(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$"))
-				return hostString;
+			try {
+				return InetAddress.getByName(hostString);
+			} catch (UnknownHostException ignored) {}
 		}
 	}
 
@@ -47,7 +57,7 @@ public class Servidor {
 		final String service = TrackerService.class.getCanonicalName();
 		final Scanner scanner = new Scanner(System.in);
 		
-		final String host = Servidor.readHost(scanner);
+		final InetAddress host = Servidor.readHost(scanner);
 		final int port = Servidor.readPort(scanner);
 		
 		final TrackerServiceImpl trackerImpl = new TrackerServiceImpl();
@@ -55,7 +65,7 @@ public class Servidor {
 			final Registry registry = LocateRegistry.createRegistry(port);
 			final TrackerService stub =
 					(TrackerService) UnicastRemoteObject.exportObject(trackerImpl, port);
-			registry.rebind(String.format("//%s:%d/%s", host, port, service), stub);
+			registry.rebind(String.format("//%s:%d/%s", host.getHostAddress(), port, service), stub);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
