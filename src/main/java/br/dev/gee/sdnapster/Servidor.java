@@ -13,7 +13,7 @@ public class Servidor {
 	public static InetAddress DEFAULT_TRACKER_HOST;
 	static {
 		try {
-			DEFAULT_TRACKER_HOST = InetAddress.getLocalHost();
+			DEFAULT_TRACKER_HOST = InetAddress.getByName("localhost");
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		}
