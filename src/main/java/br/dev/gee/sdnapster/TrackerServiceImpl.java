@@ -54,7 +54,7 @@ public class TrackerServiceImpl implements TrackerService {
 		try {
 			final String clientHost = UnicastRemoteObject.getClientHost();
 			synchronized (hostToTcpAddress) {
-				System.out.printf("Peer %s solicitou arquivo %s", hostToTcpAddress.get(clientHost), filename);
+				System.out.printf("Peer %s solicitou arquivo %s\n", hostToTcpAddress.get(clientHost), filename);
 			}
 		} catch (ServerNotActiveException e) {
 			e.printStackTrace();
