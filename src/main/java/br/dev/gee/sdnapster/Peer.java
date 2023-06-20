@@ -35,6 +35,13 @@ public class Peer {
 		public int hashCode() {
 			return this.toString().hashCode();
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof Address))
+				return false;
+			return this.toString().equals(obj.toString());
+		}
 	}
 
 	public static InetAddress DEFAULT_TCP_HOST = Servidor.DEFAULT_TRACKER_HOST;
