@@ -30,6 +30,11 @@ public class Peer {
 		public String toString() {
 			return String.format("%s:%d", this.ip.getHostAddress(), this.port);
 		}
+
+		@Override
+		public int hashCode() {
+			return this.toString().hashCode();
+		}
 	}
 
 	public static InetAddress DEFAULT_TCP_HOST = Servidor.DEFAULT_TRACKER_HOST;
