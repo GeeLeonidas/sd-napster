@@ -163,8 +163,10 @@ public class Peer {
 						tcpThread.start();
 						// Chamada RMI `TrackerService::join`
 						// Se o valor de retorno não for "JOIN_OK", volte ao menu interativo
-						if (!tracker.join(filenames, new Address(tcpHost, tcpPort)).equals("JOIN_OK"))
+						if (!tracker.join(filenames, new Address(tcpHost, tcpPort)).equals("JOIN_OK")) {
+							tcpThread.interrupt();
 							continue;
+						}
 						peerPath = finalPeerPath;
 						tcpAddress = new Address(tcpHost, tcpPort);
 						System.out.printf("Sou peer %s:%d com arquivos %s\n", tcpHost.getHostAddress(), tcpPort, String.join(" ", filenames));
