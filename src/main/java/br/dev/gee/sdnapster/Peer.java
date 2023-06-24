@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -119,8 +118,8 @@ public class Peer {
 									final Socket clientSocket = socket.accept();
 									new Thread(() -> {
 										try (
-												InputStream in = clientSocket.getInputStream();
-												OutputStream out = clientSocket.getOutputStream()
+												BufferedInputStream in = new BufferedInputStream(clientSocket.getInputStream());
+												BufferedOutputStream out = new BufferedOutputStream(clientSocket.getOutputStream())
 										) {
 											byte[] buffer = new byte[4096];
 											int bytesRead = in.read(buffer);
@@ -194,8 +193,8 @@ public class Peer {
 							new Thread(() -> {
 								try (
 										Socket serverSocket = new Socket(downloadHost, downloadPort);
-										InputStream in = serverSocket.getInputStream();
-										OutputStream out = serverSocket.getOutputStream()
+										BufferedInputStream in = new BufferedInputStream(serverSocket.getInputStream());
+										BufferedOutputStream out = new BufferedOutputStream(serverSocket.getOutputStream())
 								) {
 									out.write(String.format("DOWNLOAD\n%s\n", finalSearchedFile).getBytes(StandardCharsets.UTF_8));
 									byte[] buffer = new byte[4096];
