@@ -152,7 +152,8 @@ public class Peer {
 							}
 						});
 						tcpThread.start();
-						tracker.join(filenames, new Address(tcpHost, tcpPort)); // TODO: Handle return code
+						if (!tracker.join(filenames, new Address(tcpHost, tcpPort)).equals("JOIN_OK"))
+							continue;
 						peerPath = finalPeerPath;
 						tcpAddress = new Address(tcpHost, tcpPort);
 						System.out.printf("Sou peer %s:%d com arquivos %s\n", tcpHost.getHostAddress(), tcpPort, String.join(" ", filenames));
@@ -213,8 +214,8 @@ public class Peer {
 										}
 									}
 									if (!serverSocket.isClosed()) {
-										tracker.update(finalSearchedFile, finalTcpAddress); // TODO: Handle return code
-										System.out.printf("\nArquivo %s baixado com sucesso na pasta %s\n", finalSearchedFile, finalDownloadFolder);
+										if (tracker.update(finalSearchedFile, finalTcpAddress).equals("UPDATE_OK"))
+											System.out.printf("\nArquivo %s baixado com sucesso na pasta %s\n", finalSearchedFile, finalDownloadFolder);
 									}
 								} catch (IOException e) {
 									throw new RuntimeException(e);
