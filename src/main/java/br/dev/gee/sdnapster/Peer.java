@@ -231,6 +231,7 @@ public class Peer {
 		}
 		
 		scanner.close();
+		System.exit(0);
 	}
 
 }
