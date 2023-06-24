@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,9 +13,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Peer {
 
@@ -119,31 +119,28 @@ public class Peer {
 									final Socket clientSocket = socket.accept();
 									new Thread(() -> {
 										try (
-												BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-												BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()))
+												InputStream in = clientSocket.getInputStream();
+												OutputStream out = clientSocket.getOutputStream()
 										) {
-											String input = in.readLine();
-											if (!input.equals("DOWNLOAD"))
+											byte[] buffer = new byte[4096];
+											int bytesRead = in.read(buffer);
+											if (bytesRead == -1)
 												return;
-											input = in.readLine();
-											Path filePath = FileSystems.getDefault().getPath(finalPeerPath + input);
+											final String[] message = new String(buffer, StandardCharsets.UTF_8).split("\n");
+											if (message.length < 2 || !message[0].equals("DOWNLOAD"))
+												return;
+											Path filePath = FileSystems.getDefault().getPath(finalPeerPath + "/" + message[1]);
 											if (!Files.isRegularFile(filePath)) {
-												out.write("DOWNLOAD_ERR\n");
+												out.write("DOWNLOAD_ERR\n".getBytes(StandardCharsets.UTF_8));
 												return;
 											}
-											out.write("DOWNLOAD_OK\n");
-											out.flush();
-											try (
-													BufferedReader fileReader = Files.newBufferedReader(filePath)
-											) {
+											out.write("DOWNLOAD_OK\n".getBytes(StandardCharsets.UTF_8));
+											try (InputStream fileStream = Files.newInputStream(filePath)) {
 												while (!clientSocket.isClosed()) {
-													char[] cbuf = new char[4096];
-													int charNum = fileReader.read(cbuf);
-													if (charNum == -1)
+													bytesRead = fileStream.read(buffer);
+													if (bytesRead == -1)
 														break;
-													out.write(cbuf);
-													if (charNum < 4096)
-														break;
+													out.write(buffer, 0, bytesRead);
 												}
 											}
 										} catch (IOException e) {
@@ -192,35 +189,33 @@ public class Peer {
 								continue;
 							final String finalSearchedFile = searchedFile;
 							final Path finalDownloadFolder = peerPath;
-							final Path downloadPath = FileSystems.getDefault().getPath(finalDownloadFolder + finalSearchedFile);
+							final Path downloadPath = FileSystems.getDefault().getPath(finalDownloadFolder + "/" + finalSearchedFile);
 							final Address finalTcpAddress = tcpAddress;
 							new Thread(() -> {
 								try (
 										Socket serverSocket = new Socket(downloadHost, downloadPort);
-										BufferedReader in = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
-										BufferedWriter out = new BufferedWriter(new OutputStreamWriter(serverSocket.getOutputStream()))
+										InputStream in = serverSocket.getInputStream();
+										OutputStream out = serverSocket.getOutputStream()
 								) {
-									out.write(String.format("DOWNLOAD\n%s\n", finalSearchedFile));
-									out.flush();
-									String input = in.readLine();
-									if (!input.equals("DOWNLOAD_OK"))
+									out.write(String.format("DOWNLOAD\n%s\n", finalSearchedFile).getBytes(StandardCharsets.UTF_8));
+									byte[] buffer = new byte[4096];
+									int bytesRead = in.read(buffer);
+									if (bytesRead == -1)
 										return;
-									try (
-											BufferedWriter fileWriter = Files.newBufferedWriter(downloadPath)
-									) {
+									final String[] message = new String(buffer, StandardCharsets.UTF_8).split("\n");
+									if (message.length < 1 || !message[0].equals("DOWNLOAD_OK"))
+										return;
+									try (OutputStream fileStream = Files.newOutputStream(downloadPath)) {
 										while (!serverSocket.isClosed()) {
-											char[] cbuf = new char[4096];
-											int charNum = in.read(cbuf);
-											if (charNum == -1)
+											bytesRead = in.read(buffer);
+											if (bytesRead == -1)
 												break;
-											fileWriter.write(cbuf);
-											if (charNum < 4096)
-												break;
+											fileStream.write(buffer, 0, bytesRead);
 										}
 									}
 									if (!serverSocket.isClosed()) {
 										tracker.update(finalSearchedFile, finalTcpAddress); // TODO: Handle return code
-										System.out.printf("Arquivo %s baixado com sucesso na pasta %s\n", finalSearchedFile, finalDownloadFolder);
+										System.out.printf("\nArquivo %s baixado com sucesso na pasta %s\n", finalSearchedFile, finalDownloadFolder);
 									}
 								} catch (IOException e) {
 									throw new RuntimeException(e);
