@@ -142,6 +142,7 @@ public class Peer {
 											}
 											// Retorno em caso de sucesso
 											out.write("DOWNLOAD_OK\n".getBytes(StandardCharsets.UTF_8));
+											out.flush();
 											try (InputStream fileStream = Files.newInputStream(filePath)) {
 												while (!clientSocket.isClosed()) {
 													bytesRead = fileStream.read(buffer);
@@ -218,6 +219,7 @@ public class Peer {
 								) {
 									// Envio formatado dos dados da requisição
 									out.write(String.format("DOWNLOAD\n%s\n", finalSearchedFile).getBytes(StandardCharsets.UTF_8));
+									out.flush();
 									byte[] buffer = new byte[4096];
 									int bytesRead = in.read(buffer);
 									if (bytesRead == -1)
