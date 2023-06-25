@@ -61,6 +61,14 @@ public class TrackerServiceImpl implements TrackerService {
 
 	@Override
 	public String update(String filename, Peer.Address addressInfo) throws RemoteException {
+		try {
+			final String senderHost = UnicastRemoteObject.getClientHost();
+			if (!addressInfo.ip.getHostAddress().equals(senderHost))
+				return "UPDATE_ERR";
+		} catch (ServerNotActiveException e) {
+			e.printStackTrace();
+			return "UPDATE_ERR";
+		}
 		synchronized (hostToFileMap) {
 			if (!hostToFileMap.containsKey(addressInfo))
 				return "UPDATE_ERR";
