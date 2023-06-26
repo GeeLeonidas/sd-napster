@@ -13,7 +13,7 @@
 - Para iniciar o *peer*, execute `CLASSPATH="build/classes/java/main" java br.dev.gee.sdnapster.Peer`
   - Insira o endereço e a porta em que o servidor está rodando
   - Escolha uma das quatro opções disponíveis (`JOIN`, `SEARCH`, `DOWNLOAD`, `EXIT`)
-    - `JOIN` só pode ser executada uma vez, inserindo os dados que inicializarão tanto o estado do *peer* quanto seu servidor TCP
+    - `JOIN` só pode ser executada uma vez, inserindo os dados que inicializarão tanto o estado do *peer* quanto seu servidor TCP (i.e. endereço, arquivos disponibilizados)
     - `SEARCH` só pode ser executada após `JOIN`, inserindo o nome do arquivo que se quer achar na rede
-    - `DOWNLOAD` só pode ser executada após `SEARCH`, inserindo qual *peer* você quer baixar o arquivo pesquisado anteriormente
+    - `DOWNLOAD` só pode ser executada após `SEARCH`, inserindo de qual *peer* você quer baixar o arquivo pesquisado anteriormente
     - `EXIT` termina o programa com código 0
