@@ -1,12 +1,12 @@
-# Problemas não previstos pelo plano do projeto
+## Problemas não previstos pelo plano do projeto
 - Caso mais de um *peer* tenha o mesmo IP, o servidor não consegue detectar quem enviou a requisição `SEARCH` apenas com os parâmetros pedidos
 - Não existe forma de verificar a resiliência do servidor TCP e cancelar seu registro em caso de falha
 
-# Ambiente utilizado
+## Ambiente utilizado
 - JDK 1.8 (Eclipse Temurin)
 - Linux (kernel 6.3.9-5-default)
 
-# Instruções
+## Instruções
 - Executando o comando `gradlew compileJava`, os arquivos .class serão gerados na pasta `build/classes/java/main`
 - Para iniciar o servidor, execute `CLASSPATH="build/classes/java/main" java br.dev.gee.sdnapster.Servidor`
   - Inicialize o servidor inserindo o endereço e a porta em que deseja disponibilizá-lo
